@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="cs" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Studio - Premium Generátor a Skener QR kódů</title>
+    
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Main Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- QR Code Styling (Generator) CDN -->
+    <script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+    
+    <!-- HTML5-QRCODE (Scanner) CDN -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="glass-bg-glow"></div>
+    <div class="glass-bg-glow secondary"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="brand">
+                <div class="brand-logo">
+                    <i data-lucide="qr-code"></i>
+                </div>
+                <div>
+                    <h1>QR Studio</h1>
+                    <p class="subtitle">Profesionální nástroj pro QR kódy</p>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <!-- Theme Toggle -->
+                <button id="theme-toggle" class="btn btn-icon" title="Přepnout režim">
+                    <i data-lucide="sun" class="icon-sun"></i>
+                    <i data-lucide="moon" class="icon-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Navigation Tabs -->
+        <nav class="app-nav">
+            <button class="nav-tab active" data-tab="generator-tab">
+                <i data-lucide="cog"></i>
+                <span>Generátor</span>
+            </button>
+            <button class="nav-tab" data-tab="scanner-tab">
+                <i data-lucide="scan"></i>
+                <span>Skener</span>
+            </button>
+        </nav>
+
+        <!-- Main Grid Layout -->
+        <main class="main-content">
+            
+            <!-- Tab 1: GENERATOR -->
+            <div id="generator-tab" class="tab-panel active">
+                <div class="panel-grid">
+                    <!-- Left: Control Settings -->
+                    <section class="controls-section glass-card">
+                        <h2 class="section-title"><i data-lucide="sliders"></i>Nastavení obsahu</h2>
+                        
+                        <!-- Content Type Selector -->
+                        <div class="content-type-selector">
+                            <button class="type-btn active" data-type="text">
+                                <i data-lucide="link-2"></i> Odkaz / Text
+                            </button>
+                            <button class="type-btn" data-type="wifi">
+                                <i data-lucide="wifi"></i> Wi-Fi
+                            </button>
+                            <button class="type-btn" data-type="email">
+                                <i data-lucide="mail"></i> E-mail
+                            </button>
+                            <button class="type-btn" data-type="sms">
+                                <i data-lucide="message-square"></i> SMS
+                            </button>
+                            <button class="type-btn" data-type="vcard">
+                                <i data-lucide="contact-2"></i> Vizitka
+                            </button>
+                        </div>
+
+                        <!-- Content Input Panels -->
+                        <div class="content-inputs-wrapper">
+                            <!-- Text/URL -->
+                            <div class="input-panel active" id="input-text">
+                                <div class="form-group">
+                                    <label for="text-content">Text nebo URL adresa</label>
+                                    <textarea id="text-content" placeholder="Zadejte odkaz (např. https://...) nebo jakýkoliv text..." rows="3"></textarea>
+                                    <span class="help-text">QR kód se bude automaticky aktualizovat při psaní.</span>
+                                </div>
+                            </div>
+
+                            <!-- Wi-Fi -->
+                            <div class="input-panel" id="input-wifi">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="wifi-ssid">Název sítě (SSID)</label>
+                                        <input type="text" id="wifi-ssid" placeholder="MyWiFiNetwork">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="wifi-type">Zabezpečení</label>
+                                        <select id="wifi-type">
+                                            <option value="WPA">WPA / WPA2</option>
+                                            <option value="WEP">WEP</option>
+                                            <option value="nopass">Bez hesla (otevřená)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group" id="wifi-pass-group">
+                                    <label for="wifi-pass">Heslo</label>
+                                    <div class="password-input-wrapper">
+                                        <input type="password" id="wifi-pass" placeholder="••••••••">
+                                        <button type="button" class="toggle-password" id="wifi-toggle-pass">
+                                            <i data-lucide="eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="form-checkbox">
+                                    <input type="checkbox" id="wifi-hidden">
+                                    <label for="wifi-hidden">Skrytá síť</label>
+                                </div>
+                            </div>
+
+                            <!-- E-mail -->
+                            <div class="input-panel" id="input-email">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="email-to">Příjemce (E-mail)</label>
+                                        <input type="email" id="email-to" placeholder="priklad@domena.cz">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email-subject">Předmět</label>
+                                    <input type="text" id="email-subject" placeholder="Předmět e-mailu">
+                                </div>
+                                <div class="form-group">
+                                    <label for="email-body">Zpráva</label>
+                                    <textarea id="email-body" placeholder="Text e-mailu..." rows="3"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- SMS -->
+                            <div class="input-panel" id="input-sms">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="sms-phone">Telefonní číslo</label>
+                                        <input type="tel" id="sms-phone" placeholder="+420 123 456 789">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="sms-message">Text zprávy</label>
+                                    <textarea id="sms-message" placeholder="Zde napište text SMS..." rows="3"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- vCard / Vizitka -->
+                            <div class="input-panel" id="input-vcard">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="vcard-fn">Jméno a Příjmení</label>
+                                        <input type="text" id="vcard-fn" placeholder="Jan Novák">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="vcard-org">Společnost</label>
+                                        <input type="text" id="vcard-org" placeholder="Firma s.r.o.">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="vcard-tel">Telefonní číslo</label>
+                                        <input type="tel" id="vcard-tel" placeholder="+420 123 456 789">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="vcard-email">E-mail</label>
+                                        <input type="email" id="vcard-email" placeholder="jan.novak@firma.cz">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="vcard-url">Webová stránka</label>
+                                    <input type="url" id="vcard-url" placeholder="https://www.firma.cz">
+                                </div>
+                                <div class="form-group">
+                                    <label for="vcard-adr">Adresa</label>
+                                    <input type="text" id="vcard-adr" placeholder="Ulice 123, Město, PSČ">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Accordion for QR Design Customization -->
+                        <div class="design-accordion">
+                            <h3 class="accordion-header active" data-target="design-general">
+                                <span><i data-lucide="layout"></i> Základní nastavení</span>
+                                <i data-lucide="chevron-down" class="arrow"></i>
+                            </h3>
+                            <div class="accordion-content active" id="design-general">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="qr-size">Velikost (px)</label>
+                                        <div class="range-wrapper">
+                                            <input type="range" id="qr-size" min="200" max="800" step="50" value="400">
+                                            <span class="range-val" id="val-qr-size">400px</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="qr-margin">Okraje (px)</label>
+                                        <div class="range-wrapper">
+                                            <input type="range" id="qr-margin" min="0" max="40" step="5" value="10">
+                                            <span class="range-val" id="val-qr-margin">10px</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="qr-error-level">Úroveň opravy chyb</label>
+                                    <select id="qr-error-level">
+                                        <option value="L">L (Nízká - cca 7 % poškození)</option>
+                                        <option value="M" selected>M (Střední - cca 15 % poškození)</option>
+                                        <option value="Q">Q (Vysoká - cca 25 % poškození)</option>
+                                        <option value="H">H (Nejvyšší - cca 30 % poškození)</option>
+                                    </select>
+                                    <span class="help-text">Pro QR kódy s logem doporučujeme úroveň H.</span>
+                                </div>
+                            </div>
+
+                            <h3 class="accordion-header" data-target="design-dots">
+                                <span><i data-lucide="grid-3x3"></i> Styl a barva teček</span>
+                                <i data-lucide="chevron-down" class="arrow"></i>
+                            </h3>
+                            <div class="accordion-content" id="design-dots">
+                                <div class="form-group">
+                                    <label for="dots-type">Tvar teček</label>
+                                    <select id="dots-type">
+                                        <option value="square">Čtvercový (Klasický)</option>
+                                        <option value="dots">Kulatý (Body)</option>
+                                        <option value="rounded" selected>Zaoblený</option>
+                                        <option value="extra-rounded">Více zaoblený</option>
+                                        <option value="classy">Stylový (Zkosený)</option>
+                                        <option value="classy-rounded">Stylový zaoblený</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="dots-color-type">Typ barvy</label>
+                                    <select id="dots-color-type">
+                                        <option value="single">Jedna barva</option>
+                                        <option value="gradient">Barevný přechod</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Single Color Options -->
+                                <div id="dots-single-color-group" class="form-group">
+                                    <label for="dots-color">Barva teček</label>
+                                    <div class="color-picker-wrapper">
+                                        <input type="color" id="dots-color" value="#6366f1">
+                                        <input type="text" id="dots-color-hex" value="#6366f1" class="hex-text" maxlength="7">
+                                    </div>
+                                </div>
+
+                                <!-- Gradient Options -->
+                                <div id="dots-gradient-group" class="gradient-config hidden">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="dots-grad-type">Typ přechodu</label>
+                                            <select id="dots-grad-type">
+                                                <option value="linear">Lineární</option>
+                                                <option value="radial">Radiální</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="dots-grad-rotation">Úhel přechodu</label>
+                                            <div class="range-wrapper">
+                                                <input type="range" id="dots-grad-rotation" min="0" max="360" step="5" value="45">
+                                                <span class="range-val" id="val-dots-grad-rotation">45°</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="dots-grad-start">Počáteční barva</label>
+                                            <div class="color-picker-wrapper">
+                                                <input type="color" id="dots-grad-start" value="#6366f1">
+                                                <input type="text" id="dots-grad-start-hex" value="#6366f1" class="hex-text" maxlength="7">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="dots-grad-end">Koncová barva</label>
+                                            <div class="color-picker-wrapper">
+                                                <input type="color" id="dots-grad-end" value="#a855f7">
+                                                <input type="text" id="dots-grad-end-hex" value="#a855f7" class="hex-text" maxlength="7">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h3 class="accordion-header" data-target="design-corners">
+                                <span><i data-lucide="square-dot"></i> Rohové čtverce a body</span>
+                                <i data-lucide="chevron-down" class="arrow"></i>
+                            </h3>
+                            <div class="accordion-content" id="design-corners">
+                                <h4>Vnější rohy (Čtverce)</h4>
+                                <div class="form-group">
+                                    <label for="corners-square-type">Tvar rohů</label>
+                                    <select id="corners-square-type">
+                                        <option value="square">Čtverec</option>
+                                        <option value="dot">Kruh</option>
+                                        <option value="extra-rounded" selected>Zaoblený čtverec</option>
+                                    </select>
+                                </div>
+                                <div class="form-checkbox">
+                                    <input type="checkbox" id="corners-square-color-match" checked>
+                                    <label for="corners-square-color-match">Použít stejnou barvu jako u teček</label>
+                                </div>
+                                <div class="form-group hidden" id="corners-square-color-group">
+                                    <label for="corners-square-color">Barva vnějších rohů</label>
+                                    <div class="color-picker-wrapper">
+                                        <input type="color" id="corners-square-color" value="#6366f1">
+                                        <input type="text" id="corners-square-color-hex" value="#6366f1" class="hex-text" maxlength="7">
+                                    </div>
+                                </div>
+
+                                <hr class="divider">
+
+                                <h4>Vnitřní body v rozích</h4>
+                                <div class="form-group">
+                                    <label for="corners-dot-type">Tvar vnitřních bodů</label>
+                                    <select id="corners-dot-type">
+                                        <option value="square">Čtverec</option>
+                                        <option value="dot" selected>Kruh</option>
+                                    </select>
+                                </div>
+                                <div class="form-checkbox">
+                                    <input type="checkbox" id="corners-dot-color-match" checked>
+                                    <label for="corners-dot-color-match">Použít stejnou barvu jako u teček</label>
+                                </div>
+                                <div class="form-group hidden" id="corners-dot-color-group">
+                                    <label for="corners-dot-color">Barva vnitřních bodů</label>
+                                    <div class="color-picker-wrapper">
+                                        <input type="color" id="corners-dot-color" value="#6366f1">
+                                        <input type="text" id="corners-dot-color-hex" value="#6366f1" class="hex-text" maxlength="7">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h3 class="accordion-header" data-target="design-background">
+                                <span><i data-lucide="palette"></i> Pozadí QR kódu</span>
+                                <i data-lucide="chevron-down" class="arrow"></i>
+                            </h3>
+                            <div class="accordion-content" id="design-background">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="bg-color">Barva pozadí</label>
+                                        <div class="color-picker-wrapper">
+                                            <input type="color" id="bg-color" value="#ffffff">
+                                            <input type="text" id="bg-color-hex" value="#ffffff" class="hex-text" maxlength="7">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="bg-opacity">Průhlednost pozadí</label>
+                                        <div class="range-wrapper">
+                                            <input type="range" id="bg-opacity" min="0" max="100" step="5" value="100">
+                                            <span class="range-val" id="val-bg-opacity">100%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h3 class="accordion-header" data-target="design-logo">
+                                <span><i data-lucide="image"></i> Vložit logo / Obrázek</span>
+                                <i data-lucide="chevron-down" class="arrow"></i>
+                            </h3>
+                            <div class="accordion-content" id="design-logo">
+                                <div class="logo-upload-area" id="logo-drop-zone">
+                                    <i data-lucide="upload-cloud" class="upload-icon"></i>
+                                    <p>Přetáhněte logo sem nebo <span>vyberte soubor</span></p>
+                                    <span class="file-info">PNG, JPG, SVG (max. 500 KB)</span>
+                                    <input type="file" id="logo-input" accept="image/*" class="hidden-file-input">
+                                </div>
+                                
+                                <div id="logo-preview-wrapper" class="hidden">
+                                    <div class="logo-preview-container">
+                                        <img id="logo-preview-img" src="" alt="Náhled loga">
+                                        <button type="button" class="btn btn-sm btn-danger" id="remove-logo-btn">
+                                            <i data-lucide="trash-2"></i> Odstranit logo
+                                        </button>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="logo-size">Velikost loga</label>
+                                            <div class="range-wrapper">
+                                                <input type="range" id="logo-size" min="5" max="30" step="1" value="15">
+                                                <span class="range-val" id="val-logo-size">15%</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="logo-margin">Okraje loga (px)</label>
+                                            <div class="range-wrapper">
+                                                <input type="range" id="logo-margin" min="0" max="15" step="1" value="3">
+                                                <span class="range-val" id="val-logo-margin">3px</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-checkbox">
+                                        <input type="checkbox" id="logo-clear-bg" checked>
+                                        <label for="logo-clear-bg">Vymazat pozadí pod logem (Doporučeno)</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Right: Live Preview Panel -->
+                    <section class="preview-section glass-card">
+                        <div class="sticky-preview">
+                            <h2 class="section-title"><i data-lucide="eye"></i>Živý náhled</h2>
+                            
+                            <!-- The QR Preview Container -->
+                            <div class="qr-preview-wrapper">
+                                <div class="qr-frame">
+                                    <div class="corner TL"></div>
+                                    <div class="corner TR"></div>
+                                    <div class="corner BL"></div>
+                                    <div class="corner BR"></div>
+                                    <div id="qr-canvas-container" class="qr-canvas-container">
+                                        <!-- Canvas is generated here -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actions Row -->
+                            <div class="preview-actions">
+                                <button id="btn-download-png" class="btn btn-primary">
+                                    <i data-lucide="download"></i> Stáhnout PNG
+                                </button>
+                                <button id="btn-download-svg" class="btn btn-secondary">
+                                    <i data-lucide="file-code"></i> SVG
+                                </button>
+                                <button id="btn-copy-qr" class="btn btn-secondary btn-icon-text" title="Kopírovat obrázek do schránky">
+                                    <i data-lucide="clipboard"></i> Kopírovat
+                                </button>
+                                <button id="btn-print-qr" class="btn btn-secondary btn-icon-only" title="Vytisknout">
+                                    <i data-lucide="printer"></i>
+                                </button>
+                            </div>
+                            
+                            <div id="notification" class="notification hidden">
+                                <i data-lucide="check-circle-2"></i>
+                                <span id="notification-message">Zkopírováno!</span>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Tab 2: SCANNER -->
+            <div id="scanner-tab" class="tab-panel">
+                <div class="panel-grid">
+                    <!-- Left: Viewfinder / Capture area -->
+                    <section class="scanner-work-section glass-card">
+                        <h2 class="section-title"><i data-lucide="camera"></i>Skenovat kód</h2>
+                        
+                        <!-- Scanner Sub-Tabs -->
+                        <div class="scanner-modes">
+                            <button class="scan-mode-btn active" data-mode="camera">
+                                <i data-lucide="camera"></i> Použít kameru
+                            </button>
+                            <button class="scan-mode-btn" data-mode="file">
+                                <i data-lucide="image"></i> Nahrát obrázek
+                            </button>
+                        </div>
+
+                        <!-- Scanner View Container -->
+                        <div class="scanner-view-wrapper">
+                            <!-- Camera Scan Panel -->
+                            <div class="scan-panel active" id="scan-camera-panel">
+                                <div class="camera-controls">
+                                    <div class="form-group select-camera-group">
+                                        <label for="camera-select"><i data-lucide="video"></i> Vyberte kameru</label>
+                                        <select id="camera-select">
+                                            <option value="">Načítání kamer...</option>
+                                        </select>
+                                    </div>
+                                    <div class="camera-action-btns">
+                                        <button id="btn-toggle-camera" class="btn btn-primary">
+                                            <i data-lucide="play"></i> Zapnout kameru
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="viewfinder-container">
+                                    <!-- Scanning frame overlay -->
+                                    <div class="viewfinder-overlay" id="camera-viewfinder-overlay">
+                                        <div class="scanner-laser"></div>
+                                        <div class="scan-corner TL"></div>
+                                        <div class="scan-corner TR"></div>
+                                        <div class="scan-corner BL"></div>
+                                        <div class="scan-corner BR"></div>
+                                    </div>
+                                    <!-- The actual webcam container -->
+                                    <div id="camera-reader-element" class="camera-reader-element"></div>
+                                    
+                                    <div class="camera-placeholder" id="camera-placeholder-msg">
+                                        <i data-lucide="video-off" class="placeholder-icon"></i>
+                                        <p>Kamera je vypnutá</p>
+                                        <span>Pro skenování klikněte na tlačítko "Zapnout kameru" výše a povolte přístup.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- File Scan Panel -->
+                            <div class="scan-panel" id="scan-file-panel">
+                                <div class="file-scan-area" id="scan-file-drop-zone">
+                                    <i data-lucide="image-plus" class="upload-icon"></i>
+                                    <h3>Přetáhněte obrázek QR kódu sem</h3>
+                                    <p>nebo klikněte pro <span>výběr z počítače</span></p>
+                                    <span class="file-info">Podporuje PNG, JPG, JPEG, WebP, SVG</span>
+                                    <input type="file" id="scanner-file-input" accept="image/*" class="hidden-file-input">
+                                </div>
+                                <div id="scanner-file-preview" class="scanner-file-preview hidden">
+                                    <div class="preview-img-container">
+                                        <img id="scanned-image-preview" src="" alt="Skenovaný obrázek">
+                                        <button type="button" class="btn btn-sm btn-danger" id="remove-scan-file-btn">
+                                            <i data-lucide="x"></i> Vybrat jiný soubor
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Right: Results Panel -->
+                    <section class="results-section glass-card">
+                        <h2 class="section-title"><i data-lucide="file-text"></i>Výsledek skenování</h2>
+                        
+                        <div class="results-container">
+                            <div class="result-placeholder" id="result-placeholder">
+                                <i data-lucide="scan-face" class="placeholder-icon"></i>
+                                <p>Čekání na naskenování QR kódu</p>
+                                <span>Zapněte kameru nebo nahrajte obrázek s QR kódem.</span>
+                            </div>
+
+                            <div class="result-content-box hidden" id="result-content-box">
+                                <div class="result-header">
+                                    <span class="badge" id="result-badge">
+                                        <i data-lucide="link"></i> <span id="result-badge-text">Webový odkaz</span>
+                                    </span>
+                                    <span class="timestamp" id="result-time">před chvílí</span>
+                                </div>
+
+                                <div class="result-body">
+                                    <label for="decoded-text-val">Obsah kódu:</label>
+                                    <textarea id="decoded-text-val" readonly rows="6"></textarea>
+                                </div>
+
+                                <!-- Action Buttons depending on type -->
+                                <div class="result-actions">
+                                    <button id="btn-copy-result" class="btn btn-secondary">
+                                        <i data-lucide="clipboard"></i> Kopírovat text
+                                    </button>
+                                    
+                                    <!-- Contextual actions -->
+                                    <a href="#" id="btn-action-open-url" class="btn btn-primary hidden" target="_blank" rel="noopener">
+                                        <i data-lucide="external-link"></i> Otevřít odkaz
+                                    </a>
+                                    <button id="btn-action-wifi" class="btn btn-primary hidden">
+                                        <i data-lucide="wifi"></i> Zobrazit Wi-Fi připojení
+                                    </button>
+                                    <a href="#" id="btn-action-email" class="btn btn-primary hidden">
+                                        <i data-lucide="send"></i> Poslat e-mail
+                                    </a>
+                                    <a href="#" id="btn-action-tel" class="btn btn-primary hidden">
+                                        <i data-lucide="phone"></i> Volat
+                                    </a>
+                                </div>
+
+                                <!-- Structured Wi-Fi Info Panel (hidden by default) -->
+                                <div class="wifi-info-card hidden" id="result-wifi-details">
+                                    <h3>Detaily Wi-Fi sítě:</h3>
+                                    <ul>
+                                        <li><strong>Název (SSID):</strong> <span id="wifi-det-ssid">-</span></li>
+                                        <li><strong>Heslo:</strong> <span id="wifi-det-pass">-</span></li>
+                                        <li><strong>Šifrování:</strong> <span id="wifi-det-type">-</span></li>
+                                    </ul>
+                                    <div class="alert alert-info">
+                                        <i data-lucide="info"></i>
+                                        <p>V mobilním telefonu stačí naskenovat tento kód fotoaparátem a systém se automaticky připojí bez nutnosti ručního zadávání.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+            
+        </main>
+        
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>&copy; 2026 QR Studio. Vytvořeno s důrazem na kvalitu a design.</p>
+        </footer>
+    </div>
+
+    <!-- Script Application Logic -->
+    <script src="app.js"></script>
+</body>
+</html>
