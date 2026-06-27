@@ -323,11 +323,13 @@ document.addEventListener("DOMContentLoaded", () => {
         wifiPassInput.setAttribute("type", type);
         
         // Toggle icon
-        const icon = wifiTogglePass.querySelector("i");
-        if (type === "text") {
-            icon.setAttribute("data-lucide", "eye-off");
-        } else {
-            icon.setAttribute("data-lucide", "eye");
+        const icon = wifiTogglePass.querySelector("i, svg");
+        if (icon) {
+            if (type === "text") {
+                icon.setAttribute("data-lucide", "eye-off");
+            } else {
+                icon.setAttribute("data-lucide", "eye");
+            }
         }
         lucide.createIcons();
     });
@@ -389,6 +391,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================================================
     function getFormattedQrData() {
         const type = appState.activeContentType;
+        let data = "";
 
         switch (type) {
             case "wifi":
@@ -397,28 +400,37 @@ document.addEventListener("DOMContentLoaded", () => {
                 const wifiPass = document.getElementById("wifi-pass").value;
                 const hidden = document.getElementById("wifi-hidden").checked;
                 
-                if (!ssid) return "WIFI:S:Sample_SSID;T:WPA;P:password;;";
-                
-                if (wifiSec === "nopass") {
-                    return `WIFI:S:${escapeWifiValue(ssid)};T:nopass;H:${hidden ? "true" : "false"};;`;
+                if (!ssid) {
+                    data = "WIFI:S:Sample_SSID;T:WPA;P:password;;";
+                } else if (wifiSec === "nopass") {
+                    data = `WIFI:S:${escapeWifiValue(ssid)};T:nopass;H:${hidden ? "true" : "false"};;`;
                 } else {
-                    return `WIFI:S:${escapeWifiValue(ssid)};T:${wifiSec};P:${escapeWifiValue(wifiPass)};H:${hidden ? "true" : "false"};;`;
+                    data = `WIFI:S:${escapeWifiValue(ssid)};T:${wifiSec};P:${escapeWifiValue(wifiPass)};H:${hidden ? "true" : "false"};;`;
                 }
+                break;
 
             case "email":
                 const to = document.getElementById("email-to").value.trim();
                 const subject = document.getElementById("email-subject").value.trim();
                 const body = document.getElementById("email-body").value;
                 
-                if (!to) return "mailto:example@domain.com";
-                return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                if (!to) {
+                    data = "mailto:example@domain.com";
+                } else {
+                    data = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                }
+                break;
 
             case "sms":
                 const phone = document.getElementById("sms-phone").value.trim();
                 const message = document.getElementById("sms-message").value;
                 
-                if (!phone) return "SMSTO:+420123456789:Zprava";
-                return `SMSTO:${phone}:${message}`;
+                if (!phone) {
+                    data = "SMSTO:+420123456789:Zprava";
+                } else {
+                    data = `SMSTO:${phone}:${message}`;
+                }
+                break;
 
             case "vcard":
                 const fn = document.getElementById("vcard-fn").value.trim();
@@ -428,22 +440,34 @@ document.addEventListener("DOMContentLoaded", () => {
                 const url = document.getElementById("vcard-url").value.trim();
                 const adr = document.getElementById("vcard-adr").value.trim();
 
-                if (!fn && !tel) return "BEGIN:VCARD\nVERSION:3.0\nFN:Jan Novak\nEND:VCARD";
-                
-                let vcard = "BEGIN:VCARD\nVERSION:3.0\n";
-                if (fn) vcard += `FN:${fn}\nN:${fn};;;;\n`;
-                if (org) vcard += `ORG:${org}\n`;
-                if (tel) vcard += `TEL;TYPE=CELL:${tel}\n`;
-                if (email) vcard += `EMAIL;TYPE=INTERNET:${email}\n`;
-                if (url) vcard += `URL:${url}\n`;
-                if (adr) vcard += `ADR:;;${adr};;;;\n`;
-                vcard += "END:VCARD";
-                return vcard;
+                if (!fn && !tel) {
+                    data = "BEGIN:VCARD\nVERSION:3.0\nFN:Jan Novak\nEND:VCARD";
+                } else {
+                    let vcard = "BEGIN:VCARD\nVERSION:3.0\n";
+                    if (fn) vcard += `FN:${fn}\nN:${fn};;;;\n`;
+                    if (org) vcard += `ORG:${org}\n`;
+                    if (tel) vcard += `TEL;TYPE=CELL:${tel}\n`;
+                    if (email) vcard += `EMAIL;TYPE=INTERNET:${email}\n`;
+                    if (url) vcard += `URL:${url}\n`;
+                    if (adr) vcard += `ADR:;;${adr};;;;\n`;
+                    vcard += "END:VCARD";
+                    data = vcard;
+                }
+                break;
 
             case "text":
             default:
                 const text = document.getElementById("text-content").value.trim();
-                return text || "https://qrstudio.app";
+                data = text || "https://qrstudio.app";
+                break;
+        }
+
+        // Convert string to raw UTF-8 bytes represented in a Latin-1 string
+        try {
+            return unescape(encodeURIComponent(data));
+        } catch (e) {
+            console.error("UTF-8 encoding error", e);
+            return data;
         }
     }
 
@@ -739,17 +763,21 @@ document.addEventListener("DOMContentLoaded", () => {
     function showNotification(message, isError = false) {
         const notif = document.getElementById("notification");
         const notifMsg = document.getElementById("notification-message");
-        const icon = notif.querySelector("i");
+        const icon = notif.querySelector("i, svg");
 
         notifMsg.textContent = message;
         if (isError) {
             notif.style.borderColor = "var(--danger)";
-            icon.setAttribute("data-lucide", "alert-circle");
-            icon.style.color = "var(--danger)";
+            if (icon) {
+                icon.setAttribute("data-lucide", "alert-circle");
+                icon.style.color = "var(--danger)";
+            }
         } else {
             notif.style.borderColor = "var(--primary)";
-            icon.setAttribute("data-lucide", "check-circle-2");
-            icon.style.color = "var(--accent)";
+            if (icon) {
+                icon.setAttribute("data-lucide", "check-circle-2");
+                icon.style.color = "var(--accent)";
+            }
         }
         lucide.createIcons();
 
@@ -1045,6 +1073,8 @@ document.addEventListener("DOMContentLoaded", () => {
         resultWifiDetails.classList.add("hidden");
 
         // Parse content format
+        const badgeIcon = resultBadge.querySelector("i, svg");
+
         if (text.startsWith("http://") || text.startsWith("https://") || text.startsWith("www.")) {
             // URL Link
             let url = text;
@@ -1055,8 +1085,7 @@ document.addEventListener("DOMContentLoaded", () => {
             resultBadge.style.background = "rgba(99, 102, 241, 0.15)";
             resultBadge.style.color = "#818cf8";
             
-            const badgeIcon = resultBadge.querySelector("i");
-            badgeIcon.setAttribute("data-lucide", "link");
+            if (badgeIcon) badgeIcon.setAttribute("data-lucide", "link");
 
             btnActionOpenUrl.href = url;
             btnActionOpenUrl.classList.remove("hidden");
@@ -1067,8 +1096,7 @@ document.addEventListener("DOMContentLoaded", () => {
             resultBadge.style.background = "rgba(16, 185, 129, 0.15)";
             resultBadge.style.color = "#34d399";
             
-            const badgeIcon = resultBadge.querySelector("i");
-            badgeIcon.setAttribute("data-lucide", "wifi");
+            if (badgeIcon) badgeIcon.setAttribute("data-lucide", "wifi");
 
             // Parse parameters
             const ssid = text.match(/S:([^;]+);/)?.[1] || "-";
@@ -1087,8 +1115,7 @@ document.addEventListener("DOMContentLoaded", () => {
             resultBadge.style.background = "rgba(245, 158, 11, 0.15)";
             resultBadge.style.color = "#fbbf24";
             
-            const badgeIcon = resultBadge.querySelector("i");
-            badgeIcon.setAttribute("data-lucide", "mail");
+            if (badgeIcon) badgeIcon.setAttribute("data-lucide", "mail");
 
             btnActionEmail.href = text;
             btnActionEmail.classList.remove("hidden");
@@ -1099,8 +1126,7 @@ document.addEventListener("DOMContentLoaded", () => {
             resultBadge.style.background = "rgba(168, 85, 247, 0.15)";
             resultBadge.style.color = "#c084fc";
             
-            const badgeIcon = resultBadge.querySelector("i");
-            badgeIcon.setAttribute("data-lucide", text.startsWith("tel:") ? "phone" : "message-square");
+            if (badgeIcon) badgeIcon.setAttribute("data-lucide", text.startsWith("tel:") ? "phone" : "message-square");
 
             let phoneNum = "";
             if (text.startsWith("tel:")) {
@@ -1118,8 +1144,7 @@ document.addEventListener("DOMContentLoaded", () => {
             resultBadge.style.background = "rgba(107, 114, 128, 0.15)";
             resultBadge.style.color = "#9ca3af";
             
-            const badgeIcon = resultBadge.querySelector("i");
-            badgeIcon.setAttribute("data-lucide", "file-text");
+            if (badgeIcon) badgeIcon.setAttribute("data-lucide", "file-text");
         }
 
         lucide.createIcons();
