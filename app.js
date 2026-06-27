@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
         width: appState.generator.size,
         height: appState.generator.size,
         type: "canvas",
-        data: "https://qrstudio.app",
+        data: "https://zdenekp03.github.io/clock/",
         dotsOptions: {
             color: appState.generator.dots.color,
             type: appState.generator.dots.type
@@ -458,7 +458,7 @@ document.addEventListener("DOMContentLoaded", () => {
             case "text":
             default:
                 const text = document.getElementById("text-content").value.trim();
-                data = text || "https://qrstudio.app";
+                data = text || "https://zdenekp03.github.io/clock/";
                 break;
         }
 
