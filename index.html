@@ -206,18 +206,20 @@
                             <div class="accordion-content active" id="design-general">
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="qr-size">Velikost (px)</label>
+                                        <label for="qr-size">Rozlišení exportu (px)</label>
                                         <div class="range-wrapper">
-                                            <input type="range" id="qr-size" min="200" max="800" step="50" value="400">
+                                            <input type="range" id="qr-size" min="200" max="1200" step="50" value="400">
                                             <span class="range-val" id="val-qr-size">400px</span>
                                         </div>
+                                        <span class="help-text">Výsledné rozlišení pro stažení v PNG/SVG.</span>
                                     </div>
                                     <div class="form-group">
                                         <label for="qr-margin">Okraje (px)</label>
                                         <div class="range-wrapper">
-                                            <input type="range" id="qr-margin" min="0" max="40" step="5" value="10">
+                                            <input type="range" id="qr-margin" min="0" max="50" step="5" value="10">
                                             <span class="range-val" id="val-qr-margin">10px</span>
                                         </div>
+                                        <span class="help-text">Odsazení QR vzoru od vnějších hran.</span>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -422,7 +424,10 @@
                     <!-- Right: Live Preview Panel -->
                     <section class="preview-section glass-card">
                         <div class="sticky-preview">
-                            <h2 class="section-title"><i data-lucide="eye"></i>Živý náhled</h2>
+                            <div class="preview-header-bar">
+                                <h2 class="section-title"><i data-lucide="eye"></i>Živý náhled</h2>
+                                <span class="preview-size-badge" id="preview-size-badge">400 × 400 px</span>
+                            </div>
                             
                             <!-- The QR Preview Container -->
                             <div class="qr-preview-wrapper">

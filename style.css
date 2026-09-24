@@ -849,17 +849,46 @@ textarea {
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
+}
+
+.preview-header-bar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--divider-color);
+    padding-bottom: 12px;
+    margin-bottom: 8px;
+}
+
+.preview-header-bar .section-title {
+    margin-bottom: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.preview-size-badge {
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-family: monospace;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--badge-bg);
+    color: var(--badge-text);
+    border: 1px solid var(--input-border);
 }
 
 /* QR Code Preview Frame */
 .qr-preview-wrapper {
     width: 100%;
-    max-width: 320px;
+    max-width: 380px;
     aspect-ratio: 1;
-    margin: 24px 0 32px 0;
+    margin: 20px 0 28px 0;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all var(--transition-speed) ease;
 }
 
 .qr-frame {
@@ -869,7 +898,7 @@ textarea {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--input-border);
     border-radius: var(--border-radius);
-    padding: 24px;
+    padding: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -905,7 +934,9 @@ textarea {
 .qr-canvas-container svg {
     max-width: 100% !important;
     max-height: 100% !important;
-    height: auto !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }

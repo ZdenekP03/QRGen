@@ -57,11 +57,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // Initialize QR Code Styling generator
+    // Initialize QR Code Styling generator (using SVG to prevent canvas dot-streaking artifacts)
     const qrCode = new QRCodeStyling({
         width: appState.generator.size,
         height: appState.generator.size,
-        type: "canvas",
+        margin: appState.generator.margin,
+        type: "svg",
         data: "https://zdenekp03.github.io/clock/",
         dotsOptions: {
             color: appState.generator.dots.color,
@@ -95,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 2. THEME SYSTEM
     // ==========================================================================
     const themeToggleBtn = document.getElementById("theme-toggle");
-    
+
     function applyTheme(theme) {
         document.documentElement.setAttribute("data-theme", theme);
         localStorage.setItem("theme", theme);
@@ -118,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
     navTabs.forEach(tab => {
         tab.addEventListener("click", () => {
             const targetTab = tab.dataset.tab;
-            
+
             navTabs.forEach(t => t.classList.remove("active"));
             tabPanels.forEach(p => p.classList.remove("active"));
 
@@ -145,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
         header.addEventListener("click", () => {
             const targetId = header.dataset.target;
             const content = document.getElementById(targetId);
-            
+
             const isCurrentlyActive = header.classList.contains("active");
 
             // Close all
@@ -321,7 +322,7 @@ document.addEventListener("DOMContentLoaded", () => {
     wifiTogglePass.addEventListener("click", () => {
         const type = wifiPassInput.getAttribute("type") === "password" ? "text" : "password";
         wifiPassInput.setAttribute("type", type);
-        
+
         // Toggle icon
         const icon = wifiTogglePass.querySelector("i, svg");
         if (icon) {
@@ -355,7 +356,7 @@ document.addEventListener("DOMContentLoaded", () => {
     typeButtons.forEach(btn => {
         btn.addEventListener("click", () => {
             const type = btn.dataset.type;
-            
+
             typeButtons.forEach(b => b.classList.remove("active"));
             inputPanels.forEach(p => p.classList.remove("active"));
 
@@ -399,7 +400,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const wifiSec = document.getElementById("wifi-type").value;
                 const wifiPass = document.getElementById("wifi-pass").value;
                 const hidden = document.getElementById("wifi-hidden").checked;
-                
+
                 if (!ssid) {
                     data = "WIFI:S:Sample_SSID;T:WPA;P:password;;";
                 } else if (wifiSec === "nopass") {
@@ -413,7 +414,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const to = document.getElementById("email-to").value.trim();
                 const subject = document.getElementById("email-subject").value.trim();
                 const body = document.getElementById("email-body").value;
-                
+
                 if (!to) {
                     data = "mailto:example@domain.com";
                 } else {
@@ -424,7 +425,7 @@ document.addEventListener("DOMContentLoaded", () => {
             case "sms":
                 const phone = document.getElementById("sms-phone").value.trim();
                 const message = document.getElementById("sms-message").value;
-                
+
                 if (!phone) {
                     data = "SMSTO:+420123456789:Zprava";
                 } else {
@@ -474,10 +475,10 @@ document.addEventListener("DOMContentLoaded", () => {
     function escapeWifiValue(val) {
         // Escapes \, ;, ,, and : backslashes for WiFi syntax
         return val.replace(/\\/g, "\\\\")
-                  .replace(/;/g, "\\;")
-                  .replace(/,/g, "\\,")
-                  .replace(/:/g, "\\:")
-                  .replace(/"/g, '\\"');
+            .replace(/;/g, "\\;")
+            .replace(/,/g, "\\,")
+            .replace(/:/g, "\\:")
+            .replace(/"/g, '\\"');
     }
 
     // ==========================================================================
@@ -531,7 +532,7 @@ document.addEventListener("DOMContentLoaded", () => {
         reader.onload = (e) => {
             const dataUrl = e.target.result;
             appState.generator.logo.dataUrl = dataUrl;
-            
+
             // Show preview
             logoPreviewImg.src = dataUrl;
             logoDropZone.classList.add("hidden");
@@ -583,7 +584,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function renderQrCode() {
         const genState = appState.generator;
-        
+
         // 1. Dots options setup
         const dotsOpts = {
             type: genState.dots.type
@@ -608,7 +609,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const cornerSquareOpts = {
             type: genState.cornersSquare.type
         };
-        
+
         if (genState.cornersSquare.matchColor) {
             // Inherits from dots
             if (genState.dots.colorType === "single") {
@@ -651,6 +652,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const config = {
             width: genState.size,
             height: genState.size,
+            margin: genState.margin,
             data: getFormattedQrData(),
             qrOptions: {
                 errorCorrectionLevel: genState.errorLevel
@@ -670,93 +672,199 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Update the QR styling object
         qrCode.update(config);
+
+        // Update live resolution badge
+        const sizeBadge = document.getElementById("preview-size-badge");
+        if (sizeBadge) {
+            sizeBadge.textContent = `${genState.size} × ${genState.size} px`;
+        }
     }
 
     // Initialize first render
     renderQrCode();
 
     // ==========================================================================
-    // 10. GENERATOR ACTION BUTTONS (Download, Copy, Print)
+    // 10. HIGH-QUALITY EXPORT ENGINE (Flawless PNG rasterization from Vector SVG)
+    // ==========================================================================
+    async function svgToCanvas(size) {
+        const svgEl = qrContainer.querySelector("svg");
+        if (!svgEl) {
+            throw new Error("SVG element nebyl nalezen");
+        }
+
+        // Clone SVG to avoid altering preview DOM
+        const clonedSvg = svgEl.cloneNode(true);
+        clonedSvg.setAttribute("width", size.toString());
+        clonedSvg.setAttribute("height", size.toString());
+
+        const serializer = new XMLSerializer();
+        let svgString = serializer.serializeToString(clonedSvg);
+
+        // Guarantee necessary XML namespaces for standalone parser
+        if (!svgString.includes('xmlns="http://www.w3.org/2000/svg"')) {
+            svgString = svgString.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+        }
+        if (!svgString.includes('xmlns:xlink="http://www.w3.org/1999/xlink"')) {
+            svgString = svgString.replace('<svg', '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+        }
+
+        const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+        const URLObj = window.URL || window.webkitURL || window;
+        const blobUrl = URLObj.createObjectURL(svgBlob);
+
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                canvas.width = size;
+                canvas.height = size;
+                const ctx = canvas.getContext("2d");
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = "high";
+                ctx.drawImage(img, 0, 0, size, size);
+                URLObj.revokeObjectURL(blobUrl);
+                resolve(canvas);
+            };
+            img.onerror = (err) => {
+                URLObj.revokeObjectURL(blobUrl);
+                reject(err);
+            };
+            img.src = blobUrl;
+        });
+    }
+
+    // ==========================================================================
+    // 11. GENERATOR ACTION BUTTONS (Download, Copy, Print)
     // ==========================================================================
     const btnDownloadPng = document.getElementById("btn-download-png");
     const btnDownloadSvg = document.getElementById("btn-download-svg");
     const btnCopyQr = document.getElementById("btn-copy-qr");
     const btnPrintQr = document.getElementById("btn-print-qr");
 
-    btnDownloadPng.addEventListener("click", () => {
-        qrCode.download({ name: "qr-studio-code", extension: "png" });
+    btnDownloadPng.addEventListener("click", async () => {
+        try {
+            btnDownloadPng.disabled = true;
+            const targetSize = appState.generator.size;
+            const canvas = await svgToCanvas(targetSize);
+
+            canvas.toBlob((blob) => {
+                if (!blob) {
+                    showNotification("Chyba při exportu PNG.", true);
+                    btnDownloadPng.disabled = false;
+                    return;
+                }
+                const a = document.createElement("a");
+                const url = URL.createObjectURL(blob);
+                a.href = url;
+                a.download = `qr-code-${targetSize}x${targetSize}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                btnDownloadPng.disabled = false;
+                showNotification(`PNG (${targetSize}×${targetSize}px) úspěšně staženo!`);
+            }, "image/png");
+        } catch (err) {
+            console.error("Download PNG error:", err);
+            btnDownloadPng.disabled = false;
+            // Fallback
+            qrCode.download({ name: "qr-studio-code", extension: "png" });
+        }
     });
 
     btnDownloadSvg.addEventListener("click", () => {
-        qrCode.download({ name: "qr-studio-code", extension: "svg" });
-    });
-
-    btnCopyQr.addEventListener("click", () => {
-        const canvas = document.querySelector("#qr-canvas-container canvas");
-        if (!canvas) {
-            showNotification("Kopírování selhalo. QR kód se nenačetl.", true);
-            return;
-        }
-
-        canvas.toBlob(blob => {
-            if (!blob) {
-                showNotification("Chyba při exportu QR kódu.", true);
-                return;
+        const svgEl = qrContainer.querySelector("svg");
+        if (svgEl) {
+            const serializer = new XMLSerializer();
+            let svgString = serializer.serializeToString(svgEl);
+            if (!svgString.includes('xmlns="http://www.w3.org/2000/svg"')) {
+                svgString = svgString.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
             }
-            const item = new ClipboardItem({ "image/png": blob });
-            navigator.clipboard.write([item])
-                .then(() => {
-                    showNotification("Obrázek QR kódu zkopírován do schránky!");
-                })
-                .catch(err => {
-                    console.error("Copy failed: ", err);
-                    showNotification("Kopírování selhalo. Zkuste stáhnout PNG.", true);
-                });
-        }, "image/png");
+            const blob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "qr-studio-code.svg";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification("SVG vektorový soubor byl stažen!");
+        } else {
+            qrCode.download({ name: "qr-studio-code", extension: "svg" });
+        }
     });
 
-    btnPrintQr.addEventListener("click", () => {
-        const canvas = document.querySelector("#qr-canvas-container canvas");
-        if (!canvas) return;
+    btnCopyQr.addEventListener("click", async () => {
+        try {
+            const canvas = await svgToCanvas(appState.generator.size);
+            canvas.toBlob(blob => {
+                if (!blob) {
+                    showNotification("Kopírování selhalo. QR kód se nenačetl.", true);
+                    return;
+                }
+                const item = new ClipboardItem({ "image/png": blob });
+                navigator.clipboard.write([item])
+                    .then(() => {
+                        showNotification("Obrázek QR kódu zkopírován do schránky!");
+                    })
+                    .catch(err => {
+                        console.error("Copy failed: ", err);
+                        showNotification("Kopírování do schránky není v tomto prohlížeči podporováno. Použijte stažení PNG.", true);
+                    });
+            }, "image/png");
+        } catch (err) {
+            console.error("Copy error:", err);
+            showNotification("Kopírování selhalo.", true);
+        }
+    });
 
-        const dataUrl = canvas.toDataURL();
-        const printWindow = window.open("", "_blank");
-        
-        printWindow.document.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>Tisk QR kódu - QR Studio</title>
-                <style>
-                    body {
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: center;
-                        align-items: center;
-                        height: 100vh;
-                        margin: 0;
-                        font-family: 'Plus Jakarta Sans', sans-serif;
-                    }
-                    img {
-                        max-width: 60%;
-                        height: auto;
-                        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                        border-radius: 8px;
-                    }
-                    p {
-                        margin-top: 20px;
-                        color: #6b7280;
-                        font-size: 0.9rem;
-                    }
-                </style>
-            </head>
-            <body onload="window.print(); window.close();">
-                <img src="${dataUrl}" alt="QR Code">
-                <p>Generováno v aplikaci QR Studio</p>
-            </body>
-            </html>
-        `);
-        printWindow.document.close();
+    btnPrintQr.addEventListener("click", async () => {
+        try {
+            const printSize = Math.max(appState.generator.size, 800);
+            const canvas = await svgToCanvas(printSize);
+            const dataUrl = canvas.toDataURL("image/png");
+            const printWindow = window.open("", "_blank");
+
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Tisk QR kódu - QR Studio</title>
+                    <style>
+                        body {
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            align-items: center;
+                            height: 100vh;
+                            margin: 0;
+                            font-family: 'Plus Jakarta Sans', sans-serif;
+                        }
+                        img {
+                            max-width: 60%;
+                            height: auto;
+                            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                            border-radius: 8px;
+                        }
+                        p {
+                            margin-top: 20px;
+                            color: #6b7280;
+                            font-size: 0.9rem;
+                        }
+                    </style>
+                </head>
+                <body onload="window.print(); window.close();">
+                    <img src="${dataUrl}" alt="QR Code">
+                    <p>Generováno v aplikaci QR Studio</p>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        } catch (err) {
+            console.error("Print error:", err);
+            showNotification("Tisk selhal.", true);
+        }
     });
 
     // Notification handler helper
@@ -785,7 +893,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Clear previous timeout if any
         if (window.notifTimeout) clearTimeout(window.notifTimeout);
-        
+
         window.notifTimeout = setTimeout(() => {
             notif.classList.add("hidden");
         }, 3000);
@@ -800,7 +908,7 @@ document.addEventListener("DOMContentLoaded", () => {
     scanModeButtons.forEach(btn => {
         btn.addEventListener("click", () => {
             const mode = btn.dataset.mode;
-            
+
             scanModeButtons.forEach(b => b.classList.remove("active"));
             scanPanels.forEach(p => p.classList.remove("active"));
 
@@ -993,7 +1101,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Run detection logic
         const fileDecoder = new Html5Qrcode("camera-reader-element");
-        
+
         fileDecoder.scanFile(file, false)
             .then(decodedText => {
                 handleDecodedData(decodedText);
@@ -1024,14 +1132,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const resultBadgeText = document.getElementById("result-badge-text");
     const decodedTextVal = document.getElementById("decoded-text-val");
     const resultTime = document.getElementById("result-time");
-    
+
     // Actions
     const btnCopyResult = document.getElementById("btn-copy-result");
     const btnActionOpenUrl = document.getElementById("btn-action-open-url");
     const btnActionWifi = document.getElementById("btn-action-wifi");
     const btnActionEmail = document.getElementById("btn-action-email");
     const btnActionTel = document.getElementById("btn-action-tel");
-    
+
     // Wi-Fi detail block
     const resultWifiDetails = document.getElementById("result-wifi-details");
     const wifiDetSsid = document.getElementById("wifi-det-ssid");
@@ -1041,7 +1149,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function resetResultsDisplay() {
         resultPlaceholder.classList.remove("hidden");
         resultContentBox.classList.add("hidden");
-        
+
         // Hide all actions
         btnActionOpenUrl.classList.add("hidden");
         btnActionWifi.classList.add("hidden");
@@ -1060,7 +1168,7 @@ document.addEventListener("DOMContentLoaded", () => {
         resultPlaceholder.classList.add("hidden");
         resultContentBox.classList.remove("hidden");
         decodedTextVal.value = text;
-        
+
         // Set timestamp
         const now = new Date();
         resultTime.textContent = `dnes v ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
@@ -1084,18 +1192,18 @@ document.addEventListener("DOMContentLoaded", () => {
             resultBadgeText.textContent = "Webový odkaz";
             resultBadge.style.background = "rgba(99, 102, 241, 0.15)";
             resultBadge.style.color = "#818cf8";
-            
+
             if (badgeIcon) badgeIcon.setAttribute("data-lucide", "link");
 
             btnActionOpenUrl.href = url;
             btnActionOpenUrl.classList.remove("hidden");
-        } 
+        }
         else if (text.startsWith("WIFI:")) {
             // Wi-Fi configurations
             resultBadgeText.textContent = "Wi-Fi Síť";
             resultBadge.style.background = "rgba(16, 185, 129, 0.15)";
             resultBadge.style.color = "#34d399";
-            
+
             if (badgeIcon) badgeIcon.setAttribute("data-lucide", "wifi");
 
             // Parse parameters
@@ -1108,24 +1216,24 @@ document.addEventListener("DOMContentLoaded", () => {
             wifiDetType.textContent = secType;
 
             resultWifiDetails.classList.remove("hidden");
-        } 
+        }
         else if (text.startsWith("mailto:")) {
             // E-mail link
             resultBadgeText.textContent = "E-mail";
             resultBadge.style.background = "rgba(245, 158, 11, 0.15)";
             resultBadge.style.color = "#fbbf24";
-            
+
             if (badgeIcon) badgeIcon.setAttribute("data-lucide", "mail");
 
             btnActionEmail.href = text;
             btnActionEmail.classList.remove("hidden");
-        } 
+        }
         else if (text.startsWith("tel:") || text.startsWith("SMSTO:")) {
             // Phone call or SMS config
             resultBadgeText.textContent = text.startsWith("tel:") ? "Telefonní číslo" : "SMS Zpráva";
             resultBadge.style.background = "rgba(168, 85, 247, 0.15)";
             resultBadge.style.color = "#c084fc";
-            
+
             if (badgeIcon) badgeIcon.setAttribute("data-lucide", text.startsWith("tel:") ? "phone" : "message-square");
 
             let phoneNum = "";
@@ -1137,13 +1245,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
             btnActionTel.href = `tel:${phoneNum}`;
             btnActionTel.classList.remove("hidden");
-        } 
+        }
         else {
             // Normal Plain Text
             resultBadgeText.textContent = "Textový obsah";
             resultBadge.style.background = "rgba(107, 114, 128, 0.15)";
             resultBadge.style.color = "#9ca3af";
-            
+
             if (badgeIcon) badgeIcon.setAttribute("data-lucide", "file-text");
         }
 
@@ -1153,10 +1261,10 @@ document.addEventListener("DOMContentLoaded", () => {
     function unescapeWifiValue(val) {
         if (!val) return "";
         return val.replace(/\\;/g, ";")
-                  .replace(/\\,/g, ",")
-                  .replace(/\\:/g, ":")
-                  .replace(/\\\\/g, "\\")
-                  .replace(/\\"/g, '"');
+            .replace(/\\,/g, ",")
+            .replace(/\\:/g, ":")
+            .replace(/\\\\/g, "\\")
+            .replace(/\\"/g, '"');
     }
 
     // Copy result text to clipboard
