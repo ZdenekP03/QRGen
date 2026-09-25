@@ -90,6 +90,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const qrContainer = document.getElementById("qr-canvas-container");
     qrCode.append(qrContainer);
 
+    function fixSvgViewBox() {
+        const svg = qrContainer.querySelector("svg");
+        if (svg) {
+            const size = appState.generator.size;
+            const expectedViewBox = `0 0 ${size} ${size}`;
+            if (svg.getAttribute("viewBox") !== expectedViewBox) {
+                svg.setAttribute("viewBox", expectedViewBox);
+            }
+            if (svg.getAttribute("preserveAspectRatio") !== "xMidYMid meet") {
+                svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+            }
+        }
+    }
+
+    const qrObserver = new MutationObserver(() => {
+        fixSvgViewBox();
+    });
+    qrObserver.observe(qrContainer, { childList: true });
+
     // Debounce timer for live QR updating
     let updateQrDebounceTimer = null;
 
@@ -673,6 +692,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Update the QR styling object
         qrCode.update(config);
+        fixSvgViewBox();
 
         // Update live resolution badge
         const sizeBadge = document.getElementById("preview-size-badge");
@@ -682,6 +702,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Update preview dimensions & responsive scaling
         updatePreviewDimensions();
+        fixSvgViewBox();
     }
 
     function updatePreviewDimensions() {
@@ -695,24 +716,27 @@ document.addEventListener("DOMContentLoaded", () => {
         const size = appState.generator.size;
 
         if (appState.previewZoom1to1) {
+            // Active mode: 1:1 (Real pixels)
             qrWrapper.classList.add("is-zoomed");
-            if (zoomBtn) zoomBtn.classList.add("active");
-            if (zoomModeText) zoomModeText.textContent = "Fit";
-            if (zoomIcon) zoomIcon.setAttribute("data-lucide", "minimize-2");
+            if (zoomBtn) {
+                zoomBtn.classList.add("active");
+                zoomBtn.title = "Aktuální režim: 1:1 detail (kliknutím přepnete na Přizpůsobit)";
+            }
+            if (zoomModeText) zoomModeText.textContent = "1:1";
+            if (zoomIcon) zoomIcon.setAttribute("data-lucide", "zoom-in");
             qrFrame.style.width = `${size}px`;
             qrFrame.style.height = `${size}px`;
         } else {
+            // Active mode: Fit (Responsive adapt to container space)
             qrWrapper.classList.remove("is-zoomed");
-            if (zoomBtn) zoomBtn.classList.remove("active");
-            if (zoomModeText) zoomModeText.textContent = "1:1";
-            if (zoomIcon) zoomIcon.setAttribute("data-lucide", "zoom-in");
-            if (size < 340) {
-                qrFrame.style.width = `${size}px`;
-                qrFrame.style.height = `${size}px`;
-            } else {
-                qrFrame.style.width = "100%";
-                qrFrame.style.height = "100%";
+            if (zoomBtn) {
+                zoomBtn.classList.remove("active");
+                zoomBtn.title = "Aktuální režim: Přizpůsobit (kliknutím přepnete na 1:1 detail)";
             }
+            if (zoomModeText) zoomModeText.textContent = "Fit";
+            if (zoomIcon) zoomIcon.setAttribute("data-lucide", "maximize-2");
+            qrFrame.style.width = "100%";
+            qrFrame.style.height = "100%";
         }
 
         if (window.lucide) {
