@@ -426,12 +426,18 @@
                         <div class="sticky-preview">
                             <div class="preview-header-bar">
                                 <h2 class="section-title"><i data-lucide="eye"></i>Živý náhled</h2>
-                                <span class="preview-size-badge" id="preview-size-badge">400 × 400 px</span>
+                                <div class="preview-header-controls">
+                                    <button type="button" id="btn-toggle-zoom" class="preview-zoom-btn" title="Přepnout měřítko náhledu (Přizpůsobit / 1:1 detail)">
+                                        <i data-lucide="zoom-in" id="zoom-icon"></i>
+                                        <span id="zoom-mode-text">1:1</span>
+                                    </button>
+                                    <span class="preview-size-badge" id="preview-size-badge">400 × 400 px</span>
+                                </div>
                             </div>
                             
                             <!-- The QR Preview Container -->
-                            <div class="qr-preview-wrapper">
-                                <div class="qr-frame">
+                            <div class="qr-preview-wrapper" id="qr-preview-wrapper">
+                                <div class="qr-frame" id="qr-frame">
                                     <div class="corner TL"></div>
                                     <div class="corner TR"></div>
                                     <div class="corner BL"></div>

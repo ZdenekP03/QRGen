@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
         theme: localStorage.getItem("theme") || "dark",
         activeTab: "generator-tab",
         activeContentType: "text",
+        previewZoom1to1: false,
         generator: {
             size: 400,
             margin: 10,
@@ -678,6 +679,54 @@ document.addEventListener("DOMContentLoaded", () => {
         if (sizeBadge) {
             sizeBadge.textContent = `${genState.size} × ${genState.size} px`;
         }
+
+        // Update preview dimensions & responsive scaling
+        updatePreviewDimensions();
+    }
+
+    function updatePreviewDimensions() {
+        const qrFrame = document.getElementById("qr-frame");
+        const qrWrapper = document.getElementById("qr-preview-wrapper");
+        const zoomBtn = document.getElementById("btn-toggle-zoom");
+        const zoomModeText = document.getElementById("zoom-mode-text");
+        const zoomIcon = document.getElementById("zoom-icon");
+        if (!qrFrame || !qrWrapper) return;
+
+        const size = appState.generator.size;
+
+        if (appState.previewZoom1to1) {
+            qrWrapper.classList.add("is-zoomed");
+            if (zoomBtn) zoomBtn.classList.add("active");
+            if (zoomModeText) zoomModeText.textContent = "Fit";
+            if (zoomIcon) zoomIcon.setAttribute("data-lucide", "minimize-2");
+            qrFrame.style.width = `${size}px`;
+            qrFrame.style.height = `${size}px`;
+        } else {
+            qrWrapper.classList.remove("is-zoomed");
+            if (zoomBtn) zoomBtn.classList.remove("active");
+            if (zoomModeText) zoomModeText.textContent = "1:1";
+            if (zoomIcon) zoomIcon.setAttribute("data-lucide", "zoom-in");
+            if (size < 340) {
+                qrFrame.style.width = `${size}px`;
+                qrFrame.style.height = `${size}px`;
+            } else {
+                qrFrame.style.width = "100%";
+                qrFrame.style.height = "100%";
+            }
+        }
+
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+    }
+
+    // Zoom Mode Toggle (Fit vs 1:1 detail)
+    const btnToggleZoom = document.getElementById("btn-toggle-zoom");
+    if (btnToggleZoom) {
+        btnToggleZoom.addEventListener("click", () => {
+            appState.previewZoom1to1 = !appState.previewZoom1to1;
+            updatePreviewDimensions();
+        });
     }
 
     // Initialize first render
