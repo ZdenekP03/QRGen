@@ -1,28 +1,31 @@
 <!DOCTYPE html>
 <html lang="cs" data-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="qr-code.svg">
     <title>QR Studio - Premium Generátor a Skener QR kódů</title>
-    
+
     <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
     <!-- Main Style Sheet -->
     <link rel="stylesheet" href="style.css">
-    
+
     <!-- QR Code Styling (Generator) CDN -->
     <script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
-    
+
     <!-- HTML5-QRCODE (Scanner) CDN -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-    
+
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
+
 <body>
     <div class="glass-bg-glow"></div>
     <div class="glass-bg-glow secondary"></div>
@@ -36,10 +39,10 @@
                 </div>
                 <div>
                     <h1>QR Studio</h1>
-                    <p class="subtitle">Profesionální nástroj pro QR kódy</p>
+                    <!--<p class="subtitle">Profesionální nástroj pro QR kódy</p>-->
                 </div>
             </div>
-            
+
             <div class="header-actions">
                 <!-- Theme Toggle -->
                 <button id="theme-toggle" class="btn btn-icon" title="Přepnout režim">
@@ -63,14 +66,14 @@
 
         <!-- Main Grid Layout -->
         <main class="main-content">
-            
+
             <!-- Tab 1: GENERATOR -->
             <div id="generator-tab" class="tab-panel active">
                 <div class="panel-grid">
                     <!-- Left: Control Settings -->
                     <section class="controls-section glass-card">
                         <h2 class="section-title"><i data-lucide="sliders"></i>Nastavení obsahu</h2>
-                        
+
                         <!-- Content Type Selector -->
                         <div class="content-type-selector">
                             <button class="type-btn active" data-type="text">
@@ -96,8 +99,9 @@
                             <div class="input-panel active" id="input-text">
                                 <div class="form-group">
                                     <label for="text-content">Text nebo URL adresa</label>
-                                    <textarea id="text-content" placeholder="Zadejte odkaz (např. https://...) nebo jakýkoliv text..." rows="3"></textarea>
-                                    <span class="help-text">QR kód se bude automaticky aktualizovat při psaní.</span>
+                                    <textarea id="text-content"
+                                        placeholder="Zadejte odkaz (např. https://...) nebo jakýkoliv text..."
+                                        rows="3"></textarea>
                                 </div>
                             </div>
 
@@ -160,7 +164,8 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="sms-message">Text zprávy</label>
-                                    <textarea id="sms-message" placeholder="Zde napište text SMS..." rows="3"></textarea>
+                                    <textarea id="sms-message" placeholder="Zde napište text SMS..."
+                                        rows="3"></textarea>
                                 </div>
                             </div>
 
@@ -206,20 +211,20 @@
                             <div class="accordion-content active" id="design-general">
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="qr-size">Rozlišení exportu (px)</label>
+                                        <label for="qr-size">Rozlišení</label>
                                         <div class="range-wrapper">
                                             <input type="range" id="qr-size" min="200" max="1200" step="50" value="400">
                                             <span class="range-val" id="val-qr-size">400px</span>
                                         </div>
-                                        <span class="help-text">Výsledné rozlišení pro stažení v PNG/SVG.</span>
+                                        <span class="help-text">Výsledné rozlišení exportu PNG/SVG.</span>
                                     </div>
                                     <div class="form-group">
-                                        <label for="qr-margin">Okraje (px)</label>
+                                        <label for="qr-margin">Okraje</label>
                                         <div class="range-wrapper">
                                             <input type="range" id="qr-margin" min="0" max="50" step="5" value="10">
                                             <span class="range-val" id="val-qr-margin">10px</span>
                                         </div>
-                                        <span class="help-text">Odsazení QR vzoru od vnějších hran.</span>
+                                        <span class="help-text">Odsazení QR kódu od vnějších hran.</span>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -257,13 +262,14 @@
                                         <option value="gradient">Barevný přechod</option>
                                     </select>
                                 </div>
-                                
+
                                 <!-- Single Color Options -->
                                 <div id="dots-single-color-group" class="form-group">
                                     <label for="dots-color">Barva teček</label>
                                     <div class="color-picker-wrapper">
                                         <input type="color" id="dots-color" value="#6366f1">
-                                        <input type="text" id="dots-color-hex" value="#6366f1" class="hex-text" maxlength="7">
+                                        <input type="text" id="dots-color-hex" value="#6366f1" class="hex-text"
+                                            maxlength="7">
                                     </div>
                                 </div>
 
@@ -280,7 +286,8 @@
                                         <div class="form-group">
                                             <label for="dots-grad-rotation">Úhel přechodu</label>
                                             <div class="range-wrapper">
-                                                <input type="range" id="dots-grad-rotation" min="0" max="360" step="5" value="45">
+                                                <input type="range" id="dots-grad-rotation" min="0" max="360" step="5"
+                                                    value="45">
                                                 <span class="range-val" id="val-dots-grad-rotation">45°</span>
                                             </div>
                                         </div>
@@ -290,14 +297,16 @@
                                             <label for="dots-grad-start">Počáteční barva</label>
                                             <div class="color-picker-wrapper">
                                                 <input type="color" id="dots-grad-start" value="#6366f1">
-                                                <input type="text" id="dots-grad-start-hex" value="#6366f1" class="hex-text" maxlength="7">
+                                                <input type="text" id="dots-grad-start-hex" value="#6366f1"
+                                                    class="hex-text" maxlength="7">
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label for="dots-grad-end">Koncová barva</label>
                                             <div class="color-picker-wrapper">
                                                 <input type="color" id="dots-grad-end" value="#a855f7">
-                                                <input type="text" id="dots-grad-end-hex" value="#a855f7" class="hex-text" maxlength="7">
+                                                <input type="text" id="dots-grad-end-hex" value="#a855f7"
+                                                    class="hex-text" maxlength="7">
                                             </div>
                                         </div>
                                     </div>
@@ -326,7 +335,8 @@
                                     <label for="corners-square-color">Barva vnějších rohů</label>
                                     <div class="color-picker-wrapper">
                                         <input type="color" id="corners-square-color" value="#6366f1">
-                                        <input type="text" id="corners-square-color-hex" value="#6366f1" class="hex-text" maxlength="7">
+                                        <input type="text" id="corners-square-color-hex" value="#6366f1"
+                                            class="hex-text" maxlength="7">
                                     </div>
                                 </div>
 
@@ -348,7 +358,8 @@
                                     <label for="corners-dot-color">Barva vnitřních bodů</label>
                                     <div class="color-picker-wrapper">
                                         <input type="color" id="corners-dot-color" value="#6366f1">
-                                        <input type="text" id="corners-dot-color-hex" value="#6366f1" class="hex-text" maxlength="7">
+                                        <input type="text" id="corners-dot-color-hex" value="#6366f1" class="hex-text"
+                                            maxlength="7">
                                     </div>
                                 </div>
                             </div>
@@ -363,7 +374,8 @@
                                         <label for="bg-color">Barva pozadí</label>
                                         <div class="color-picker-wrapper">
                                             <input type="color" id="bg-color" value="#ffffff">
-                                            <input type="text" id="bg-color-hex" value="#ffffff" class="hex-text" maxlength="7">
+                                            <input type="text" id="bg-color-hex" value="#ffffff" class="hex-text"
+                                                maxlength="7">
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -387,7 +399,7 @@
                                     <span class="file-info">PNG, JPG, SVG (max. 500 KB)</span>
                                     <input type="file" id="logo-input" accept="image/*" class="hidden-file-input">
                                 </div>
-                                
+
                                 <div id="logo-preview-wrapper" class="hidden">
                                     <div class="logo-preview-container">
                                         <img id="logo-preview-img" src="" alt="Náhled loga">
@@ -407,7 +419,8 @@
                                         <div class="form-group">
                                             <label for="logo-margin">Okraje loga (px)</label>
                                             <div class="range-wrapper">
-                                                <input type="range" id="logo-margin" min="0" max="15" step="1" value="3">
+                                                <input type="range" id="logo-margin" min="0" max="15" step="1"
+                                                    value="3">
                                                 <span class="range-val" id="val-logo-margin">3px</span>
                                             </div>
                                         </div>
@@ -427,14 +440,15 @@
                             <div class="preview-header-bar">
                                 <h2 class="section-title"><i data-lucide="eye"></i>Živý náhled</h2>
                                 <div class="preview-header-controls">
-                                    <button type="button" id="btn-toggle-zoom" class="preview-zoom-btn" title="Aktuální režim: Přizpůsobit (kliknutím přepnete na 1:1 detail)">
+                                    <button type="button" id="btn-toggle-zoom" class="preview-zoom-btn"
+                                        title="Aktuální režim: Přizpůsobit (kliknutím přepnete na 1:1 detail)">
                                         <i data-lucide="maximize-2" id="zoom-icon"></i>
                                         <span id="zoom-mode-text">Fit</span>
                                     </button>
                                     <span class="preview-size-badge" id="preview-size-badge">400 × 400 px</span>
                                 </div>
                             </div>
-                            
+
                             <!-- The QR Preview Container -->
                             <div class="qr-preview-wrapper" id="qr-preview-wrapper">
                                 <div class="qr-frame" id="qr-frame">
@@ -456,14 +470,15 @@
                                 <button id="btn-download-svg" class="btn btn-secondary">
                                     <i data-lucide="file-code"></i> SVG
                                 </button>
-                                <button id="btn-copy-qr" class="btn btn-secondary btn-icon-text" title="Kopírovat obrázek do schránky">
+                                <button id="btn-copy-qr" class="btn btn-secondary btn-icon-text"
+                                    title="Kopírovat obrázek do schránky">
                                     <i data-lucide="clipboard"></i> Kopírovat
                                 </button>
                                 <button id="btn-print-qr" class="btn btn-secondary btn-icon-only" title="Vytisknout">
                                     <i data-lucide="printer"></i>
                                 </button>
                             </div>
-                            
+
                             <div id="notification" class="notification hidden">
                                 <i data-lucide="check-circle-2"></i>
                                 <span id="notification-message">Zkopírováno!</span>
@@ -479,7 +494,7 @@
                     <!-- Left: Viewfinder / Capture area -->
                     <section class="scanner-work-section glass-card">
                         <h2 class="section-title"><i data-lucide="camera"></i>Skenovat kód</h2>
-                        
+
                         <!-- Scanner Sub-Tabs -->
                         <div class="scanner-modes">
                             <button class="scan-mode-btn active" data-mode="camera">
@@ -519,11 +534,12 @@
                                     </div>
                                     <!-- The actual webcam container -->
                                     <div id="camera-reader-element" class="camera-reader-element"></div>
-                                    
+
                                     <div class="camera-placeholder" id="camera-placeholder-msg">
                                         <i data-lucide="video-off" class="placeholder-icon"></i>
                                         <p>Kamera je vypnutá</p>
-                                        <span>Pro skenování klikněte na tlačítko "Zapnout kameru" výše a povolte přístup.</span>
+                                        <span>Pro skenování klikněte na tlačítko "Zapnout kameru" výše a povolte
+                                            přístup.</span>
                                     </div>
                                 </div>
                             </div>
@@ -535,7 +551,8 @@
                                     <h3>Přetáhněte obrázek QR kódu sem</h3>
                                     <p>nebo klikněte pro <span>výběr z počítače</span></p>
                                     <span class="file-info">Podporuje PNG, JPG, JPEG, WebP, SVG</span>
-                                    <input type="file" id="scanner-file-input" accept="image/*" class="hidden-file-input">
+                                    <input type="file" id="scanner-file-input" accept="image/*"
+                                        class="hidden-file-input">
                                 </div>
                                 <div id="scanner-file-preview" class="scanner-file-preview hidden">
                                     <div class="preview-img-container">
@@ -552,7 +569,7 @@
                     <!-- Right: Results Panel -->
                     <section class="results-section glass-card">
                         <h2 class="section-title"><i data-lucide="file-text"></i>Výsledek skenování</h2>
-                        
+
                         <div class="results-container">
                             <div class="result-placeholder" id="result-placeholder">
                                 <i data-lucide="scan-face" class="placeholder-icon"></i>
@@ -578,9 +595,10 @@
                                     <button id="btn-copy-result" class="btn btn-secondary">
                                         <i data-lucide="clipboard"></i> Kopírovat text
                                     </button>
-                                    
+
                                     <!-- Contextual actions -->
-                                    <a href="#" id="btn-action-open-url" class="btn btn-primary hidden" target="_blank" rel="noopener">
+                                    <a href="#" id="btn-action-open-url" class="btn btn-primary hidden" target="_blank"
+                                        rel="noopener">
                                         <i data-lucide="external-link"></i> Otevřít odkaz
                                     </a>
                                     <button id="btn-action-wifi" class="btn btn-primary hidden">
@@ -604,7 +622,8 @@
                                     </ul>
                                     <div class="alert alert-info">
                                         <i data-lucide="info"></i>
-                                        <p>V mobilním telefonu stačí naskenovat tento kód fotoaparátem a systém se automaticky připojí bez nutnosti ručního zadávání.</p>
+                                        <p>V mobilním telefonu stačí naskenovat tento kód fotoaparátem a systém se
+                                            automaticky připojí bez nutnosti ručního zadávání.</p>
                                     </div>
                                 </div>
                             </div>
@@ -612,9 +631,9 @@
                     </section>
                 </div>
             </div>
-            
+
         </main>
-        
+
         <!-- Footer -->
         <footer class="app-footer">
             <p>&copy; 2026 QR Studio. Vytvořeno s důrazem na kvalitu a design.</p>
@@ -624,4 +643,5 @@
     <!-- Script Application Logic -->
     <script src="app.js"></script>
 </body>
+
 </html>
