@@ -807,12 +807,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================================================
-    // 11. GENERATOR ACTION BUTTONS (Download, Copy, Print)
+    // 11. GENERATOR ACTION BUTTONS (Download, Copy)
     // ==========================================================================
     const btnDownloadPng = document.getElementById("btn-download-png");
     const btnDownloadSvg = document.getElementById("btn-download-svg");
     const btnCopyQr = document.getElementById("btn-copy-qr");
-    const btnPrintQr = document.getElementById("btn-print-qr");
 
     btnDownloadPng.addEventListener("click", async () => {
         try {
@@ -889,54 +888,6 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (err) {
             console.error("Copy error:", err);
             showNotification("Kopírování selhalo.", true);
-        }
-    });
-
-    btnPrintQr.addEventListener("click", async () => {
-        try {
-            const printSize = Math.max(appState.generator.size, 800);
-            const canvas = await svgToCanvas(printSize);
-            const dataUrl = canvas.toDataURL("image/png");
-            const printWindow = window.open("", "_blank");
-
-            printWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Tisk QR kódu - QR Studio</title>
-                    <style>
-                        body {
-                            display: flex;
-                            flex-direction: column;
-                            justify-content: center;
-                            align-items: center;
-                            height: 100vh;
-                            margin: 0;
-                            font-family: 'Plus Jakarta Sans', sans-serif;
-                        }
-                        img {
-                            max-width: 60%;
-                            height: auto;
-                            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                            border-radius: 8px;
-                        }
-                        p {
-                            margin-top: 20px;
-                            color: #6b7280;
-                            font-size: 0.9rem;
-                        }
-                    </style>
-                </head>
-                <body onload="window.print(); window.close();">
-                    <img src="${dataUrl}" alt="QR Code">
-                    <p>Generováno v aplikaci QR Studio</p>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
-        } catch (err) {
-            console.error("Print error:", err);
-            showNotification("Tisk selhal.", true);
         }
     });
 
