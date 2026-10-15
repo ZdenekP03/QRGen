@@ -67,7 +67,8 @@ document.addEventListener("DOMContentLoaded", () => {
         data: "https://zdenekp03.github.io/clock/",
         dotsOptions: {
             color: appState.generator.dots.color,
-            type: appState.generator.dots.type
+            type: appState.generator.dots.type,
+            roundSize: false
         },
         backgroundOptions: {
             color: appState.generator.background.color
@@ -607,7 +608,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // 1. Dots options setup
         const dotsOpts = {
-            type: genState.dots.type
+            type: genState.dots.type,
+            roundSize: false
         };
 
         if (genState.dots.colorType === "single") {
