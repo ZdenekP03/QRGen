@@ -236,6 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function setupSlider(sliderId, labelId, valueSuffix, stateTarget) {
         const slider = document.getElementById(sliderId);
         const label = document.getElementById(labelId);
+        if (!slider || !label) return;
 
         slider.addEventListener("input", (e) => {
             const val = e.target.value;
@@ -247,9 +248,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setupSlider("qr-size", "val-qr-size", "px", (val) => {
         appState.generator.size = parseInt(val);
-    });
-    setupSlider("qr-margin", "val-qr-margin", "px", (val) => {
-        appState.generator.margin = parseInt(val);
     });
     setupSlider("dots-grad-rotation", "val-dots-grad-rotation", "°", (val) => {
         appState.generator.dots.gradient.rotation = parseInt(val);
